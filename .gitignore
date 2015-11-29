@@ -1,4 +1,4 @@
 #exclude node modules
-/serverside/node_modules/
-/clientside/node_modules/
+/serverside/node_modules
+/clientside/node_modules
 *.log
