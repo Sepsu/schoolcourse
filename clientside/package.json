@@ -1,0 +1,40 @@
+{
+  "name": "clientside",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --compilers js:babel-core/register --require ./test/test_helper.js 'test/**/*.@(js|jsx)'",
+    "test:watch": "npm run test -- --watch",
+    "dev": "./node_modules/.bin/webpack",
+    "devrun": "./node_modules/.bin/webpack-dev-server"
+  },
+  "keywords": [],
+  "author": "Severi Tikkala",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.2.1",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.1.18",
+    "babel-preset-react": "^6.1.18",
+    "chai": "^3.4.1",
+    "chai-immutable": "^1.5.3",
+    "jsdom": "^7.1.0",
+    "mocha": "^2.3.4",
+    "react-hot-loader": "^1.3.0",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "react"
+    ]
+  },
+  "dependencies": {
+    "immutable": "^3.7.5",
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3",
+    "react-router": "^1.0.0-rc3"
+  }
+}
