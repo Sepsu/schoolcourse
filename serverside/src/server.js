@@ -6,7 +6,7 @@ import sio from 'socket.io';
 import Promise from "promise"
 
 //Own imports
-import {initDB, getDB, closeDB } from "./database"
+import {initDB, getDB, closeDB, getData } from "./database"
 
 
 export default function startServer() {
@@ -17,17 +17,22 @@ export default function startServer() {
 	server.listen(8001);	
   	//const io = new sio().listen(server);
   	
-  	initDB().then(() => {
-  			
-  			let database = getDB();
-  			let collection = database.get('elotesti');
-  			collection.find({"username" : "testuser1"}).complete((err,doc) => {
-  			if (err) throw err;			
-  			console.log(doc)
-  			closeDB();
+  	initDB().then(() => {  		
+  		      getData("user.name", "Nakki").then((data) =>{
+            console.log("data returned:");
+            console.log(data);
+            closeDB();
+
+        }); 			
   		});
 
-});
+  	app.use((req, res) =>{
+
+
+
+  	});
+
+
     	
   
   	console.log("Server is listening at port %s",  server.address().port);
