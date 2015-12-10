@@ -1,0 +1,9 @@
+@import 'variables';
+@import 'settings'; // foundation settings
+@import 'normalize';
+@import 'node_modules/foundation-sites/scss/foundation';
+
+// components
+@import 'components/home';
+@import 'components/data_table';
+@import 'components/panel';
