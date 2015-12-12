@@ -1,22 +1,35 @@
 
 //Server imports
-import http from "http";
-import Express from 'express'
-import sio from 'socket.io';
+import Server from 'socket.io';
 import Promise from "promise"
 
 //Own imports
-import {initDB, getDB, closeDB, getData } from "./database"
+//import {initDB, getDB, closeDB, getData } from "./database"
 
 
-export default function startServer() {
+export default function startServer(store) {
 
-	
-	const app = new Express();
-	const server = new http.Server(app);
-	server.listen(8001);	
-  	//const io = new sio().listen(server);
-  	
+	 const io = new Server().attach(8090);	
+  
+     store.subscribe(
+    () => io.emit('state', store.getState())
+    );
+
+  io.on('connection', (socket) => {
+    socket.emit('state', store.getState());
+    socket.on('action', store.dispatch.bind(store));
+  });
+
+
+
+
+
+
+
+
+
+
+  /*	
   	initDB().then(() => {  		
   		      getData("user.name", "Nakki").then((data) =>{
             console.log("data returned:");
@@ -25,17 +38,12 @@ export default function startServer() {
 
         }); 			
   		});
-
-  	app.use((req, res) =>{
-
-
-
-  	});
-
+*/
+  	
 
     	
   
-  	console.log("Server is listening at port %s",  server.address().port);
+  	console.log("Server is running");
 
 
 }
