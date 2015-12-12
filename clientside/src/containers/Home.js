@@ -12,14 +12,14 @@ export class Home extends Component {
   static propTypes = {
      info: PropTypes.object,
      loading: PropTypes.bool.isRequired,
-     username: PropTypes.string.isRequired,
+     user: PropTypes.object.isRequired,
      labels: PropTypes.array.isRequired,
      data: PropTypes.array.isRequired,
      load: PropTypes.func.isRequired,
    }
 
   render() {
-    const {info,loading,username,labels,data,load} = this.props; // eslint-disable-line no-shadow
+    const {info,loading,user,labels,data,load} = this.props; // eslint-disable-line no-shadow
     const chartData = {
       labels,
       // Showing only some of the labels needed for the x-axis but for all tooltips
@@ -80,11 +80,9 @@ export class Home extends Component {
               <Panel title="User" icon="glyphicon glyphicon-user">
                 <DataTable>
                   <dt>name</dt>
-                  <dd>{username}</dd>
+                  <dd>{user.name}</dd>
                   <dt>age</dt>
-                  <dd>{username}</dd>
-                  <dt>waa</dt>
-                  <dd>11</dd>
+                  <dd>{user.age}</dd>
                 </DataTable>
               </Panel>
             </div>
@@ -96,9 +94,11 @@ export class Home extends Component {
 }
 
 function mapStateToProps(state) {
+  //state = state.toJS();
+  console.log(state.getIn(["data", "data"]).toArray());
   return {
     loading: state.get('loading'),
-    username: state.getIn(['user','name']),
+    user: state.get('user').toObject(),
     labels: state.getIn(['data', 'labels']).toArray(),
     data: state.getIn(['data','data']).toArray()
   };
