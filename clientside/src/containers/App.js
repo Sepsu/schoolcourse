@@ -1,17 +1,36 @@
 
 import React, { Component, PropTypes } from 'react';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+import * as actionCreators from '../redux/sensors';
+import {connect} from 'react-redux';
 
-export default class App extends Component {
+export class App extends Component {
+  mixins: [PureRenderMixin];
+  
   static propTypes = {
     children: PropTypes.object.isRequired
   }
 
  
-  chooseSensor() {
-    return 0;
+  handleInput(){
+      let username = this.refs.username.value;
+      let password = this.refs.password.value;
+      const {connect} = this.props;
+      //validation
+      if (username === "" || password === ""){
+        console.log("enter valid username and password");
+      }
+      else{ 
+        console.log(username, " ", password);
+        connect(username, password);
+      }
   }
+ 
+
 
   render() {
+    const {connected,user,disconnect} = this.props;
+
     return (
       <div className="appContent">
         <nav className="top-bar" data-topbar role="navigation">
@@ -23,17 +42,22 @@ export default class App extends Component {
           </ul>
 
           <section className="top-bar-section">
-            <ul className="right">
-              <li className="active"><a>Refresh</a></li>
-              <li className="has-dropdown">
-                <a href="#">Sensor 1</a>
-                <ul className="dropdown">
-                  <li><a onClick={this.chooseSensor}>Sensor 1</a></li>
-                  <li><a onClick={this.chooseSensor}>Sensor 2</a></li>
-                  <li><a onClick={this.chooseSensor}>Sensor 3</a></li>
-                </ul>
-              </li>
-            </ul>
+            
+            {connected ? 
+              <ul className="tittle-area">
+              <li className="name"><h1>User {user.name} connected</h1></li>
+              <li className="active" onClick={disconnect}><a>Disconnect</a></li>
+              </ul>
+              :
+              <ul className="center">
+              <li className="name"><h1>USERNAME:</h1></li>
+              <li className="active"><input ref="username" type="text"/></li>
+              <li className="name"><h1>PASSWORD:</h1></li>
+              <li className="active"><input ref="password" type="text"/></li>
+              <li className="active" onClick={this.handleInput.bind(this)}><a>Connect</a></li>
+              </ul>
+             }
+            
           </section>
         </nav>
         {this.props.children}
@@ -41,3 +65,13 @@ export default class App extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  state = state.toJS();
+  return {
+    loading: state.loading,
+    user: state.user,
+    connected: state.connected
+  };
+}
+export const appContainer = connect(mapStateToProps,actionCreators)(App);

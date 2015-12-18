@@ -1,8 +1,9 @@
 import React, {Component, PropTypes} from 'react';
-
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 export default
 class Panel extends Component {
-
+  mixins: [PureRenderMixin];
+  
   static propTypes = {
     children: PropTypes.object.isRequired,
     className: PropTypes.string,

@@ -3,23 +3,53 @@ import {DataTable,Panel} from '../components';
 import { Line } from 'react-chartjs';
 import * as actionCreators from '../redux/sensors';
 import {connect} from 'react-redux';
-
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 
 export class Home extends Component {
 
+  constructor(props){
+    super(props);
+    this.cur_sen = null;
+  }
+
+  mixins: [PureRenderMixin];
+
   static propTypes = {
      info: PropTypes.object,
      loading: PropTypes.bool.isRequired,
-     user: PropTypes.object.isRequired,
-     labels: PropTypes.array.isRequired,
-     data: PropTypes.array.isRequired,
-     load: PropTypes.func.isRequired,
+     user: PropTypes.object,
+     labels: PropTypes.array,
+     data: PropTypes.array,
+     connect: PropTypes.func.isRequired,
    }
 
+  //Dispatch the load action only if new sensor is selected
+  load1(sensor) {
+      const {load} = this.props;
+      if (!this.cur_sen || (this.cur_sen !== sensor.sen)){
+        this.cur_sen = sensor.sen;
+        console.log("calling load1 with parameter: ", sensor);
+        console.log(sensor);
+        load(sensor.sen);
+      }
+      else {
+        console.log("sensor already loaded");
+        return
+      }
+   }
+
+  //move this to login...
+ connect1() {
+      const {connect} = this.props;
+      console.log("calling connect");      
+      connect("Nakki","joo");  
+   }
+
+
   render() {
-    const {info,loading,user,labels,data,load} = this.props; // eslint-disable-line no-shadow
+    const {info,loading,user,sensors,labels,data} = this.props;
     const chartData = {
       labels,
       // Showing only some of the labels needed for the x-axis but for all tooltips
@@ -31,11 +61,11 @@ export class Home extends Component {
           pointColor: 'rgba(151,187,205,1)',
           pointStrokeColor: '#fff',
           pointHighlightFill: '#fff',
-          pointHighlightStroke: 'rgba(151,187,205,1)',
+          pointHighlightStroke: 'rgba(151,187,205,1)',        
           data: data
-          // No gap for the null data -> needs own tweaking for chartjs
         }
-      ]
+      ],
+      loading: loading
     };
     const chartOptions = {
       responsive: true
@@ -45,10 +75,8 @@ export class Home extends Component {
       refreshClassName = 'loading';
       };
 
-    let load1 = () => {
-      load('loading',!loading);
-    }
 
+    
     return (
       
       <div className="home">
@@ -56,34 +84,41 @@ export class Home extends Component {
           <div className="row">
             <div className="small-12 medium-8 columns">
               <Panel title="Monitor" icon="glyphicon glyphicon-align-left">
+                <div>
                 <nav className="sensor-select">
+               
                   <ul className="button-group">
-                    <li><a className="button tiny">Sensor 1</a></li>
-                    <li><a className="button tiny">Sensor 2</a></li>
-                    <li><a className="button tiny">Sensor 3</a></li>
-                    <li><a className="button tiny">Sensor 4</a></li>
-                    <li><a className="button tiny">Sensor 5</a></li>
+                  {sensors ? 
+                   sensors.map((sen) =>
+                    <li key={sen}><a className="button tiny" onClick={this.load1.bind(this,{sen})}>{sen}</a></li>                 
+                    ) : ""
+                 }
                   </ul>
+
                 </nav>
                 {info ? info.toString() : 'no info!'}
-                <button className={'btn btn-success'} onClick={load1}>
+                <button className={'btn btn-success'} onClick={this.connect1.bind(this)}>
                 {refreshClassName}
-                </button>
+                </button> 
                 <Line
                   data={chartData}
                   options={chartOptions}
                   width="600"
-                  height="250" />
+                  height="600" redraw/>
+                  </div>
               </Panel>
             </div>
             <div className="small-12 medium-4 columns">
-              <Panel title="User" icon="glyphicon glyphicon-user">
+              <Panel title="User" icon="glyphicon glyphicon-user">  
+              {user ?           
                 <DataTable>
                   <dt>name</dt>
                   <dd>{user.name}</dd>
                   <dt>age</dt>
                   <dd>{user.age}</dd>
                 </DataTable>
+                  : <div/>
+            }
               </Panel>
             </div>
           </div>
@@ -94,14 +129,13 @@ export class Home extends Component {
 }
 
 function mapStateToProps(state) {
-  //state = state.toJS();
-  console.log(state.getIn(["data", "data"]).toArray());
+  state = state.toJS();
   return {
-    loading: state.get('loading'),
-    user: state.get('user').toObject(),
-    labels: state.getIn(['data', 'labels']).toArray(),
-    data: state.getIn(['data','data']).toArray()
+    loading: state.loading,
+    user: state.user,
+    sensors: state.sensors,
+    labels: state.data.labels,
+    data: state.data.data
   };
 }
-
 export const homeContainer = connect(mapStateToProps,actionCreators)(Home);

@@ -2,3 +2,4 @@
 /serverside/node_modules
 /clientside/node_modules
 *.log
+/clientside/dist/bundle.js

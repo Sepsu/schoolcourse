@@ -1,23 +1,19 @@
 import {Map} from 'immutable';
 
-const LOAD = 'LOAD';
-const LOAD_SUCCESS = 'LOAD_SUCCESS';
-const LOAD_FAIL = 'LOAD_FAIL';
-
-
 
 export default function reducer(state = Map(), action) {
   switch (action.type) {
     case "SET_STATE":
-      console.log("set-statessa");
+      console.log("Setting state");
       return state.merge(state,action.state);
-    case LOAD:
-      console.log("in load");
-      return state.set(action.param, action.val);
-    
-//below cases not implemented
-    case LOAD_SUCCESS:   
-    case LOAD_FAIL:
+    //Set local state to "loading", nothing else
+    case "CONNECT":
+      console.log("connecting");
+      return state;
+    case "LOAD":
+      console.log("loadissa");
+      return state;
+  
     default:
       return state;
   }
@@ -30,15 +26,29 @@ export function setState(state){
   };
 }
 
-
-
-export function load(param,val) {
+export function load(val) {
+  console.log("calling load action");
     return {
       meta: {remote: true},
       type: "LOAD",
-      param: param,
-      val: val   
+      val: val 
     };
 }
 
+export function connect(user,password) {
+    return {
+      meta: {remote: true},
+      type: "CONNECT",
+      user: user,
+      password: password   
+    };
+}
 
+export function disconnect(){
+console.log("disconnecting");
+return {
+      meta: {remote: true},
+      type: "DISCONNECT"   
+    };
+
+}

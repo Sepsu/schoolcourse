@@ -9,7 +9,7 @@ import {createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import remoteActionMiddleware from "./redux/middleware"
 import reducer, {setState} from "./redux/sensors"
-import {App, homeContainer} from "./containers";
+import {appContainer, homeContainer} from "./containers";
 
 require('./stylesheets/app.scss');
 
@@ -29,10 +29,6 @@ const createStoreWithMiddleware = applyMiddleware(
 const store = createStoreWithMiddleware(reducer);
 store.dispatch(setState({
 	 
-		user : {
-			name : "",
-			age : 0
-		},
 		loaded : false,
 		loading : true,
 		data : {
@@ -44,7 +40,7 @@ store.dispatch(setState({
 
 
 
-const routes = <Route component={App}>
+const routes = <Route component={appContainer}>
       <Route path="/" component={homeContainer} info="testing info"/>
     </Route>;
 
