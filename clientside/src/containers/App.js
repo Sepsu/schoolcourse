@@ -6,6 +6,12 @@ import {connect} from 'react-redux';
 
 export class App extends Component {
   mixins: [PureRenderMixin];
+
+   constructor(props){
+    super(props);
+    this.userErr = false;
+    this.passErr = false;
+  }
   
   static propTypes = {
     children: PropTypes.object.isRequired
@@ -15,14 +21,29 @@ export class App extends Component {
   handleInput(){
       let username = this.refs.username.value;
       let password = this.refs.password.value;
+      let fine = true;
       const {connect} = this.props;
       //validation
-      if (username === "" || password === ""){
-        console.log("enter valid username and password");
-      }
-      else{ 
+      if (username === ""){
+        console.log("enter valid username");
+        this.userErr = true;
+        fine = false;
+      } else this.userErr = false;
+      if (password === ""){
+        console.log("enter valid password");
+        this.passErr = true;
+        fine = false;
+      } else this.passErr = false;
+
+      if (fine){
+        this.userErr = false;
+        this.passErr = false; 
         console.log(username, " ", password);
         connect(username, password);
+      }
+      //Force rerendering to display the errors
+      else {
+        this.forceUpdate();
       }
   }
  
@@ -36,32 +57,47 @@ export class App extends Component {
         <nav className="top-bar" data-topbar role="navigation">
           <ul className="title-area">
             <li className="name">
-              <h1><a href="#">eloSeed</a></h1>
+              <h1><a href="#">eloSpaces</a></h1>
             </li>
             <li className="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
           </ul>
-
-          <section className="top-bar-section">
+        </nav>
+         <section className="container">
             
             {connected ? 
-              <ul className="tittle-area">
-              <li className="name"><h1>User {user.name} connected</h1></li>
-              <li className="active" onClick={disconnect}><a>Disconnect</a></li>
-              </ul>
+              <div className="row">
+              <div className="small-2 columns own-text">User {user.name} connected</div>
+              <div className="small-2 columns active"><button className="button-success" onClick={disconnect}>Disconnect</button></div>
+              </div>
               :
-              <ul className="center">
-              <li className="name"><h1>USERNAME:</h1></li>
-              <li className="active"><input ref="username" type="text"/></li>
-              <li className="name"><h1>PASSWORD:</h1></li>
-              <li className="active"><input ref="password" type="text"/></li>
-              <li className="active" onClick={this.handleInput.bind(this)}><a>Connect</a></li>
-              </ul>
+              <div className="row">
+
+              <div className="small-6 medium-2 columns own-text">USERNAME:</div>
+              <div className="small-6 medium-3 columns">
+              <input className="error" ref="username" type="text"/>
+              {this.userErr ? 
+              <small className="error">Invalid entry</small>
+              : ""}
+              </div>
+              <div className="small-6 medium-2 columns own-text">PASSWORD:</div>
+              <div className="small-6 medium-3 columns"><input className="error" ref="password" type="text"/>
+              {this.passErr ? 
+              <small className="error">Invalid entry</small>
+              : ""}
+              </div>
+              <div className="small-6 medium-2 columns active"><button className="button-success" onClick={this.handleInput.bind(this)}>Connect</button></div>
+              </div>
              }
             
           </section>
-        </nav>
         {this.props.children}
+    
+      <div className="container">
+        <div className="row">
+          <div className="small-12 small-offset-6 columns own-text">EXAMPLE FOOTER</div>
+        </div>
       </div>
+    </div>
     );
   }
 }
