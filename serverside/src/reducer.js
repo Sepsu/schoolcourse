@@ -11,35 +11,35 @@ export default function reducer(state = Map(), action) {
   
   //Connect the user
   case "CONNECT":
-    connectUser(action.user, action.password); //Async
-    return {connecting : true};
+    connectUser(action.user, action.password, action.socket); //Async
+    return {socket : action.socket,connecting : true};
 
   //Take the parameter to load
   case "LOAD":
-    loadData(action.val); //Async
+    loadData(action.val, action.socket); //Async
     if (action.connected){
-      return {connected : action.connected, loading : true,
+      return {socket : action.socket,connected : action.connected, loading : true,
        sensors : action.sensors, user : action.user};
     }
     //Tell to client that data is being loaded
-  	return {loading : true};
+  	return {socket : action.socket, loading : true};
   
   //Disconnect the user
   case "DISCONNECT":
   	console.log("Server is closing db");
-  	closeDB();
-  	return {connected : false, connecting : false, loading : false, 
+  	closeDB(action.socket.id);
+  	return {socket : action.socket,connected : false, connecting : false, loading : false, 
       user : {name : null, age : null}};
   
   //Return error
   case "FAILURE":
    console.log("FAILURE");  
-    return {error : action.error, loading : false, loaded : false};
+    return {error : action.error, socket : action.socket, loading : false, loaded : false};
   
   //Return the data
   case "SUCCESS":
     console.log("SUCCESS");	
-    return {data : action.data, loading : false, loaded : true};
+    return {data : action.data, socket : action.socket, loading : false, loaded : true};
 
   //default  
   console.log("Server is returning null state");  
@@ -50,9 +50,9 @@ export default function reducer(state = Map(), action) {
 
 
 
-export function connectUser(user, password) {
+export function connectUser(user, password, socket) {
     console.log("Server is connecting db");
-    connectDB(action.user, action.password).then((param) => {
+    connectDB(user, password, socket.id).then((param) => {
       //After async connection and load initial data
       let sens = param.sensors;
       let user = param.user;
@@ -62,26 +62,27 @@ export function connectUser(user, password) {
             val : sens[0], 
             connected : true, 
             sensors : sens,
-            user : user
+            user : user,
+            socket
            });
       }       
     },
     (err) => {
       //Tell the client about connection error
       console.log(err);
-      store.dispatch({type: "FAILURE", error: err});
+      store.dispatch({type: "FAILURE", error: err, socket});
     });
 }
 
-export function loadData(val){
+export function loadData(val,socket){
   console.log("Server is loading from db");
-  getData(val).then((data) => {
+  getData(val,socket.id).then((data) => {
     //After async load, send data to client     
-    store.dispatch({type: "SUCCESS" , data});
+    store.dispatch({type: "SUCCESS" , data, socket});
     },
     (err) => {
       //Tell the client about loading error
       console.log(err);
-      store.dispatch({type: "FAILURE", error: err});
+      store.dispatch({type: "FAILURE", error: err, socket});
     });
 }

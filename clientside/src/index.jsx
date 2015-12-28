@@ -50,3 +50,12 @@ ReactDOM.render((
 </Provider>),
      document.getElementById('app')
 );
+
+window.onbeforeunload = closingCode;
+function closingCode(){
+   console.log("calling exit code");
+   console.log("socket", socket.id);
+   socket.emit("disconnect");
+   socket.disconnect();
+   return null;
+}

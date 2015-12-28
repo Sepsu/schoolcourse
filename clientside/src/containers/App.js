@@ -41,6 +41,7 @@ export class App extends Component {
         this.userErr = false;
         this.passErr = false; 
         console.log(username, " ", password);
+        this.user = username;
         connect(username, password);
       }
       //Force rerendering to display the errors
@@ -48,11 +49,14 @@ export class App extends Component {
         this.forceUpdate();
       }
   }
- 
+ disconnect1() {
+  const {disconnect,user} = this.props;
+  disconnect(user.name);
+ }
 
 
   render() {
-    const {connected,user,disconnect,connecting} = this.props;
+    const {connected,user,connecting} = this.props;
 
     return (
 
@@ -70,7 +74,7 @@ export class App extends Component {
             
             {connected ? 
               <div className="row">
-              <div className="small-6 columns"><button className="button-success" onClick={disconnect}>Disconnect</button></div>
+              <div className="small-6 columns"><button className="button-success" onClick={this.disconnect1.bind(this)}>Disconnect</button></div>
               </div>
               :
               <div className="row">

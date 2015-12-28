@@ -8,7 +8,7 @@ import {store} from "../index"
 
 export var local_state = {
 	db : null,
-	user : null,
+	users : [],
 };
 
 
@@ -32,29 +32,37 @@ export function getDB() {
   	return  local_state.db
   }
 
-export function closeDB() {
+export function closeDB(socket_id) {
 	return new Promise((resolve) =>{
   	if (local_state.db){
-  		 local_state.db.close((err,result) => { 
-  		 	local_state.db = null; local_state.user = null;
+  		if (local_state.users.lenght >= 1){
+  			let i = findId(socket_id,"sid");
+  			local_state.users.splice(i,1);
+  			return resolve("user disconnected");
+  		}
+  		else{
+  			local_state.db.close((err,result) => { 
+  		 	local_state.db = null; local_state.users = [];
   		 	resolve("disconnected");
   		 });
+  		}
   	}
   	resolve("nothing to disconnect");
   	});
   }
 
-export function connectDB(user, password){
+
+
+export function connectDB(user, password, socket_id){
 	
 	return new Promise((resolve,reject) => {
-	if (!local_state.user){
 		console.log("setting new db connection");
 		let db = getDB();
 		//for testing purposes lets connect to db if it not connected
 		if (!db){
 			initDB("elospacesdb.cloudapp.net/test").then(() => {
 			store.dispatch({type : "CONNECT", user : user, password : password});
-			reject(new Error("Had to reconnected to the database"));
+			return reject(new Error("Had to reconnected to the database"));
 		});
 		}
 		else{
@@ -63,18 +71,23 @@ export function connectDB(user, password){
 		coll.find({"user.name" : user, "user.password" : password}).complete((err,doc) => {
 			if (err) { 
 				console.log("error while connecting");	
-				reject("Error while connecting", err);
+				return reject("Error while connecting", err);
 			}
 			else {				
 				if (doc.length){
-					console.log("connection success");			
+								
 					let temp = doc[0];
+					let res = findId(temp._id,"id");			
+					if (res !== -1){
+						return reject(new Error("This user has already connected to the server"));
+					}
+					console.log("connection success");
 					let sensors = [];
 					for (var key of Object.keys(temp.data)){
 						sensors.push(key);
 					}
 			
-					local_state.user = temp._id;
+					local_state.users.push({ id : temp._id, user : temp.user.name, sid : socket_id});
 					let user = { name : temp.user.name, age : temp.user.age};
 					resolve({sensors :sensors, user : user});	
 				}
@@ -83,21 +96,16 @@ export function connectDB(user, password){
 			}			
 		});
 	}
-}
-	else 
-		reject(new Error("Already connected to the server"));
-
 	});
 
 }
 
-export function getData(val, sensor=true){
+export function getData(val, socket_id ,sensor=true){
 	return new Promise((resolve,reject) => {
 		let db = getDB();
 		let coll = db.get('elospaces');
-		
-
-		if (!local_state.user){			
+		let i = findId(socket_id,"sid");
+		if (user === -1){			
 			return reject(new Error("Connect first to the database..."));
 		}
 		if (!val){
@@ -107,7 +115,7 @@ export function getData(val, sensor=true){
 		let v = "data."+val;
 		console.log("Fetching data with query: ", v);
 		//Find with the connected user and receive only the queried fields the parameters
-		coll.find({"_id" : local_state.user}, v).complete((err,doc) => {
+		coll.find({"_id" : user.id}, v).complete((err,doc) => {
 		if (err) { 			
 			reject(new Error("error during data fetch", err));
 		}
@@ -125,6 +133,18 @@ export function getData(val, sensor=true){
 	
 
 }
+
+function findId(a,b){
+	let i = -1;
+	for (var x of local_state.users){
+		i++;
+		if (x[b] === a)
+			return i;
+	}
+	return i;
+}
+
+
 
 //parse the data for the chart depending on sensor type and field name
 function parseData(doc, sensor) {
