@@ -16,6 +16,8 @@ export class Home extends Component {
     this.data = {labels : [], data: []};
     this.cur_ind = 0;
     this.time = {start : 0, end : 60};
+    this.reload = true;
+    this.prevErr = null;
   }
 
   mixins: [PureRenderMixin];
@@ -37,6 +39,7 @@ export class Home extends Component {
         console.log("calling load1 with parameter: ", sensor);
         console.log(sensor);
         load(sensor.sen);
+        this.reload = true;
       }
       else {
         console.log("sensor already loaded");
@@ -44,7 +47,7 @@ export class Home extends Component {
       }
    }
 
-  //move this to login...
+  //Scaling function to choose how much of the data is visible
   scale(time){
     if (time.time === 60){
       this.borders.right = true;
@@ -63,6 +66,7 @@ export class Home extends Component {
     this.forceUpdate();
   }
 
+  //Moving around the data
   move(dir){
     const {labels, data} = this.props;
     console.log(this.time);
@@ -90,16 +94,23 @@ export class Home extends Component {
     this.forceUpdate();
   }
 
+  //Functiong to buffer data from the server
   buffering(){
 
   }
 
   render() {
-    const {info,loading,connected,user,sensors,labels,data} = this.props;
+    const {info,loading,connected,user,sensors,labels,data,error} = this.props;
+    //Update data to object if new data is loaded
+    if (this.reload && !loading){
+      this.data.labels = labels;
+      this.data.data = data;
+      this.reload = false;
+    }
     const times = [10,20,30,40,50,60];
     const chartData = {
       labels : this.data.labels,
-      // Showing only some of the labels needed for the x-axis but for all tooltips
+      // Showing only some of x-labels will be added in chartjs 2.0
       datasets: [
         {
           label: 'My Second dataset',
@@ -117,18 +128,15 @@ export class Home extends Component {
     const chartOptions = {
       responsive: true
     };
-      let refreshClassName = 'load';
+      let refreshClassName = 'fa fa-spinner';
       if (loading) {
-      refreshClassName = 'loading';
+
+      refreshClassName += ' fa-spin';
       }
-
-
-
-    
     return (
       
       <div className="home">
-      {true ? 
+      {connected ? 
         <div className="container">
         <div className="row">
             <div className="small-12 medium-4 columns">
@@ -144,7 +152,7 @@ export class Home extends Component {
             }
               </Panel>
             </div>
-            <div className="small-12 medium-4 columns">
+             <div className="small-12 medium-4 columns">
               <Panel title="Key Values" icon="glyphicon glyphicon-user">  
               {user ?           
                 <DataTable>
@@ -159,13 +167,36 @@ export class Home extends Component {
             </div>
           </div>
           <div className="row">
+            <div className="small-12 medium-12 columns">
+              <Panel title="CONSOLE" icon="glyphicon glyphicon-user">  
+                        
+                <DataTable>
+                  
+                  <dt>Current:</dt>
+                  <dd>{error}</dd>
+                  
+                  {this.prevErr ?
+                  <div> 
+                   <dt>Previous:</dt>
+                   <dd>{this.prevErr}</dd>
+                   </div>
+                   : ""
+                  }
+                  
+                </DataTable>
+                   <div/>
+            
+              </Panel>
+            </div>
+          </div>
+          <div className="row">
             <div className="small-12 columns">
               <Panel title="Monitor" icon="glyphicon glyphicon-align-left">
                 <div className="button-bar">
                   <ul className="button-group small-12">
                   {sensors ? 
                    sensors.map((sen) =>
-                    <li key={sen}><a className="button" onClick={this.load1.bind(this,{sen})}>{sen}</a></li>                 
+                    <li key={sen}><a className="button" onClick={this.load1.bind(this,{sen})}><i className={refreshClassName}/>{" "}{sen}</a></li>                 
                     ) : ""
                  }
                  </ul>
@@ -189,22 +220,22 @@ export class Home extends Component {
                    }
                    </div>
                   </div>
-                {info ? info.toString() : 'no info!'}
-                
-                
-                
+             
+                <div>         
                 <Line
                   data={chartData}
                   options={chartOptions}
                   width=""
-                  height="" redraw/>
-               
+                  height="" redraw/> 
+                  </div>                    
               </Panel>
-            </div>
-           
+
+            </div>                
           </div>
         </div>
         : ""
+        
+        
       }
       </div>
     );
@@ -219,7 +250,8 @@ function mapStateToProps(state) {
     user: state.user,
     sensors: state.sensors,
     labels: state.data.labels,
-    data: state.data.data
+    data: state.data.data,
+    error: state.error
   };
 }
 export const homeContainer = connect(mapStateToProps,actionCreators)(Home);

@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import * as actionCreators from '../redux/sensors';
 import {connect} from 'react-redux';
+import FontAwesome from "react-fontawesome";
+
 
 export class App extends Component {
   mixins: [PureRenderMixin];
@@ -50,9 +52,10 @@ export class App extends Component {
 
 
   render() {
-    const {connected,user,disconnect} = this.props;
+    const {connected,user,disconnect,connecting} = this.props;
 
     return (
+
       <div className="appContent">
         <nav className="top-bar" data-topbar role="navigation">
           <ul className="title-area">
@@ -63,38 +66,48 @@ export class App extends Component {
           </ul>
         </nav>
          <section className="container">
+         
             
             {connected ? 
               <div className="row">
-              <div className="small-2 columns own-text">User {user.name} connected</div>
-              <div className="small-2 columns active"><button className="button-success" onClick={disconnect}>Disconnect</button></div>
+              <div className="small-6 columns"><button className="button-success" onClick={disconnect}>Disconnect</button></div>
               </div>
               :
               <div className="row">
-
-              <div className="small-6 medium-2 columns own-text">USERNAME:</div>
-              <div className="small-6 medium-3 columns">
+              
+              <div className="small-6 medium-6 columns own-text">USERNAME:</div>
+              <div className="small-6 medium-6 columns">
               <input className="error" ref="username" type="text"/>
+
               {this.userErr ? 
               <small className="error">Invalid entry</small>
               : ""}
               </div>
-              <div className="small-6 medium-2 columns own-text">PASSWORD:</div>
-              <div className="small-6 medium-3 columns"><input className="error" ref="password" type="text"/>
+              <div className="small-6 medium-6 columns own-text">PASSWORD:</div>
+              <div className="small-6 medium-6 columns"><input className="error" ref="password" type="text"/>
               {this.passErr ? 
               <small className="error">Invalid entry</small>
               : ""}
+
               </div>
-              <div className="small-6 medium-2 columns active"><button className="button-success" onClick={this.handleInput.bind(this)}>Connect</button></div>
+              {connecting ?
+ <div className="small-6 medium-3 columns-end columns active"><button className="button-success">
+<i className="fa fa-spinner fa-spin"/>
+  </button></div>
+               : 
+              <div className="small-6 medium-3 columns-end columns active"><button className="button-success" onClick={this.handleInput.bind(this)}>Connect</button></div>
+              }
               </div>
+
              }
             
           </section>
+          
         {this.props.children}
-    
+   
       <div className="container">
         <div className="row">
-          <div className="small-12 small-offset-6 columns own-text">EXAMPLE FOOTER</div>
+          <div className="small-6 small-offset-6 columns own-text">EXAMPLE FOOTER</div>
         </div>
       </div>
     </div>
@@ -107,7 +120,8 @@ function mapStateToProps(state) {
   return {
     loading: state.loading,
     user: state.user,
-    connected: state.connected
+    connected: state.connected,
+    connecting: state.connecting
   };
 }
 export const appContainer = connect(mapStateToProps,actionCreators)(App);

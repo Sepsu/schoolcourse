@@ -12,7 +12,7 @@ import reducer, {setState} from "./redux/sensors"
 import {appContainer, homeContainer} from "./containers";
 
 require('./stylesheets/app.scss');
-
+require ("font-awesome/scss/font-awesome.scss");
 
 const socket = io(`${location.protocol}//${location.hostname}:8090`);
 socket.on('state', state => {
