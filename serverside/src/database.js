@@ -57,7 +57,7 @@ export function closeDB(socket_id) {
   }
 
 
-
+// Allows multiple users from same socket? bug or is it even possible with unique sockets?
 export function connectDB(user, password, socket){
 	
 	return new Promise((resolve,reject) => {
@@ -107,7 +107,7 @@ export function connectDB(user, password, socket){
 
 }
 
-export function getData(val, socket_id ,sensor=true){
+export function getData(val, socket_id="0" ,sensor=true){
 	return new Promise((resolve,reject) => {
 		let db = getDB();
 		let coll = db.get('elospaces');
