@@ -109,11 +109,7 @@ export class App extends Component {
           
         {this.props.children}
    
-      <div className="container">
-        <div className="row">
-          <div className="small-6 small-offset-6 columns own-text">EXAMPLE FOOTER</div>
-        </div>
-      </div>
+      
     </div>
     );
   }

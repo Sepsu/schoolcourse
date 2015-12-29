@@ -7,7 +7,6 @@ import {initDB} from "./database"
 
 export default function startServer(store) {
   var connections = [];
-  var active_socket = null;
   //Socket io is using port 8090
   const io = new Server().attach(8090);
   //Connect to database server on start	
@@ -31,14 +30,13 @@ export default function startServer(store) {
       connections.push(socket);
       socket.emit('state', store.getState());
       socket.on('action', (action) => {
-        active_socket = socket;
         action.socket = socket;
         store.dispatch(action);
       });
       socket.on('disconnect', () => {
         let i = connections.indexOf(socket);
         connections.splice(i,1);
-        console.log("Server lost a connection");
+        console.log("Server lost a connection of socket", socket.id);
         store.dispatch({type : "DISCONNECT", socket: socket});
 
       });

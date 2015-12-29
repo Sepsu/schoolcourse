@@ -18,7 +18,7 @@ export default function reducer(state = Map(), action) {
   case "LOAD":
     loadData(action.val, action.socket); //Async
     if (action.connected){
-      return {socket : action.socket,connected : action.connected, loading : true,
+      return {socket : action.socket,connected : action.connected, connecting : false, loading : true,
        sensors : action.sensors, user : action.user};
     }
     //Tell to client that data is being loaded
@@ -33,8 +33,9 @@ export default function reducer(state = Map(), action) {
   
   //Return error
   case "FAILURE":
-   console.log("FAILURE");  
-    return {error : action.error, socket : action.socket, loading : false, loaded : false};
+   console.log("FAILURE");
+   console.log(action.error); 
+    return { socket : action.socket, loading : false, loaded : false};
   
   //Return the data
   case "SUCCESS":
@@ -52,7 +53,8 @@ export default function reducer(state = Map(), action) {
 
 export function connectUser(user, password, socket) {
     console.log("Server is connecting db");
-    connectDB(user, password, socket.id).then((param) => {
+    console.log("parameter check ", socket.id);
+    connectDB(user, password, socket).then((param) => {
       //After async connection and load initial data
       let sens = param.sensors;
       let user = param.user;
@@ -82,6 +84,7 @@ export function loadData(val,socket){
     },
     (err) => {
       //Tell the client about loading error
+      console.log("loading error");
       console.log(err);
       store.dispatch({type: "FAILURE", error: err, socket});
     });
