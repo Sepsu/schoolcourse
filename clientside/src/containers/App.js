@@ -56,7 +56,7 @@ export class App extends Component {
 
 
   render() {
-    const {connected,user,connecting} = this.props;
+    const {connected,user,connecting,error} = this.props;
 
     return (
 
@@ -102,8 +102,14 @@ export class App extends Component {
               <div className="small-6 medium-3 columns-end columns active"><button className="button-success" onClick={this.handleInput.bind(this)}>Connect</button></div>
               }
               </div>
-
-             }
+              }
+              {error ? 
+              <div className="row">
+              <div className="small-6 medium-6 columns">         
+              <small className="error">{error}</small>
+              </div>
+              </div>
+             : ""}
             
           </section>
           
@@ -121,7 +127,8 @@ function mapStateToProps(state) {
     loading: state.loading,
     user: state.user,
     connected: state.connected,
-    connecting: state.connecting
+    connecting: state.connecting,
+    error : state.error
   };
 }
 export const appContainer = connect(mapStateToProps,actionCreators)(App);

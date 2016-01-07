@@ -13,11 +13,11 @@ describe('database logic', () => {
   	it("connects to a database server or throws an error", () => {
   		expect(local_state).to.deep.equal({db : null, users : []});
 
-  		initDB("aafadfdsf").then((err) => {
+  		/*initDB().then((err) => {
   			expect(err).to.equal(new Error('Failed to connect'));
-  		});
+  		});*/
   		
-  		initDB("elospacesdb.cloudapp.net/test").then(() => {
+  		initDB().then(() => {
   			expect(local_state).not.to.deep.equal({db : null});
   		});
 

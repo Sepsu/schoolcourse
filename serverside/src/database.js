@@ -3,7 +3,8 @@ import monk from "monk"
 
 import {store} from "../index"
 
-
+const DB = "localhost:27017/elospaces"
+//const DB = "elospacesdb.cloudapp.net/test"
 
 
 export var local_state = {
@@ -12,9 +13,9 @@ export var local_state = {
 };
 
 
-export function initDB(dbName) {
+export function initDB() {
   	return new Promise((resolve,reject) => {
-  		let db = monk(dbName);
+  		let db = monk(DB);
 		if (!db) {
 			reject(new Error('Failed to connect'));
 		} else {
@@ -66,9 +67,9 @@ export function connectDB(user, password, socket){
 		let db = getDB();
 		//for testing purposes lets connect to db if it not connected
 		if (!db){
-			initDB("elospacesdb.cloudapp.net/test").then(() => {
+			initDB(DB).then(() => {
 			store.dispatch({type : "CONNECT", user : user, password : password, socket : socket});
-			return reject(new Error("Had to reconnected to the database"));
+			return reject(new Error("Had to reconnected to the database, please wait!"));
 		});
 		}
 		else{

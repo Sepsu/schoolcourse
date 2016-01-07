@@ -126,6 +126,7 @@ export class Home extends Component {
       loading: loading
     };
     const chartOptions = {
+      animation: false,
       responsive: true
     };
       let refreshClassName = 'fa fa-spinner';
@@ -174,14 +175,8 @@ export class Home extends Component {
                   
                   <dt>Current:</dt>
                   <dd>{error}</dd>
-                  
-                  {this.prevErr ?
-                  <div> 
-                   <dt>Previous:</dt>
-                   <dd>{this.prevErr}</dd>
-                   </div>
-                   : ""
-                  }
+                  <dt>input:</dt>
+                  <dd><input ref="username" type="text"/> </dd>              
                   
                 </DataTable>
                    <div/>
