@@ -97,7 +97,7 @@ export function connectDB(user, password, socket){
 			
 					local_state.users.push({ id : tempId, user : temp.user.name, sid : socket_id});
 					let user = { name : temp.user.name, age : temp.user.age};
-					resolve({sensors :sensors, user : user});	
+					return resolve({sensors :sensors, user : user});	
 				}
 				
 				reject(new Error("User not found or invalid password..."));
@@ -141,12 +141,10 @@ export function getData(val, socket_id="0" ,sensor=true){
 	
 
 }
-
+//Find the index of value "a" from a list of objects with field "b"
 function findId(a,b){
 	let i = 0;
 	for (var x of local_state.users){	
-		console.log(typeof(x[b]));
-		console.log(typeof(a));	
 		if (x[b] === a){
 			return i;
 		}
@@ -157,24 +155,19 @@ function findId(a,b){
 
 
 
-//parse the data for the chart depending on sensor type and field name
+//parse the data for the chart
 function parseData(doc, sensor) {
 	console.log("Parsing the data...");
-	//console.log(doc);
 	if (!sensor){
-	
 		return doc;
-
 	}
 	let data = {labels : [], data : []};
+	//Currently loads only the first index of the data array, later should take parameter how much to load
+	//Also the loop should be replaces with .map() to increase performace and this could be anynchrounously not to block the server
 	for (var x of doc){
 		data.labels.push(x.ts);
 		data.data.push(x.values[0]);
 	}
-	//console.log(data);
 	console.log("The data is parsed, returning...");
 	return data;
-	
-		
-
 }

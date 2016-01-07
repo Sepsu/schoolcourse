@@ -167,23 +167,7 @@ export class Home extends Component {
               </Panel>
             </div>
           </div>
-          <div className="row">
-            <div className="small-12 medium-12 columns">
-              <Panel title="CONSOLE" icon="glyphicon glyphicon-user">  
-                        
-                <DataTable>
-                  
-                  <dt>Current:</dt>
-                  <dd>{error}</dd>
-                  <dt>input:</dt>
-                  <dd><input ref="username" type="text"/> </dd>              
-                  
-                </DataTable>
-                   <div/>
-            
-              </Panel>
-            </div>
-          </div>
+         
           <div className="row">
             <div className="small-12 columns">
               <Panel title="Monitor" icon="glyphicon glyphicon-align-left">

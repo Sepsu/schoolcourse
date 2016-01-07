@@ -12,23 +12,18 @@ export default function startServer(store) {
   //Connect to database server on start	
   initDB().then(() => { 
     console.log("Server is running");
-
     //Subscribe store to emit state changes to socket
     store.subscribe(() => {
       console.log("emitting answer");
       let ans =  store.getState();
-      /*if (ans.message){
-        io.emit("message", ans)
-      }
-      else{*/
       let soc = ans.socket;
       delete ans["socket"];
       if (soc){
         console.log("active socket ",soc.id);
         soc.emit('state',ans);
       }
-    //}
     });
+
     //On new connection emit the current state and bind store to listen socket
     io.on('connection', (socket) => {
       console.log("Server got new connection:");
